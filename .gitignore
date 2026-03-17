@@ -1,0 +1,41 @@
+# Entorno virtual
+.venv/
+venv/
+
+# Variables de entorno (contiene credenciales)
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Build / distribución
+dist/
+build/
+*.egg-info/
+*.egg
+.eggs/
+
+# uv
+.uv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Parquet / datos temporales
+*.parquet
+*.csv
+data/
