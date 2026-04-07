@@ -25,9 +25,10 @@ class _NoScrollComboBox(QComboBox):
 
 
 from codi.ui.views.historial_panel import (
-    DEMO_HISTORIAL, HistorialEntry, HistorialItemWidget, HistorialDetailPanel,
+    HistorialEntry, HistorialItemWidget, HistorialDetailPanel,
 )
 from codi.ui.views.novedades_view import NovedadesView, DEMO_NOVEDADES
+from codi.core.history_service import fetch_history
 
 # ── Datos ─────────────────────────────────────────────────────────────────────
 
@@ -324,22 +325,54 @@ class CargueView(QWidget):
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
 
-        inner = QWidget()
-        inner_layout = QVBoxLayout(inner)
-        inner_layout.setContentsMargins(8, 8, 8, 8)
-        inner_layout.setSpacing(6)
+        self._history_inner = QWidget()
+        self._history_layout = QVBoxLayout(self._history_inner)
+        self._history_layout.setContentsMargins(8, 8, 8, 8)
+        self._history_layout.setSpacing(6)
 
         self._selected_item: HistorialItemWidget | None = None
 
-        for entry in DEMO_HISTORIAL:
-            item = HistorialItemWidget(entry, self._on_historial_item_click)
-            inner_layout.addWidget(item)
+        self.refresh_history()
 
-        inner_layout.addStretch()
-        scroll.setWidget(inner)
+        scroll.setWidget(self._history_inner)
         vbox.addWidget(scroll)
 
         return container
+
+    def refresh_history(self):
+        """Limpia y vuelve a cargar el historial desde la base de datos."""
+        # Limpiar layout
+        while self._history_layout.count():
+            child = self._history_layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
+            elif child.spacerItem():
+                pass # El stretch se quita al final al reconstruir
+        
+        self._selected_item = None
+        if hasattr(self, "_detail_panel"):
+            self._detail_panel._show_empty()
+
+        # Cargar datos
+        try:
+            history = fetch_history()
+            if not history:
+                lbl = QLabel("No hay registros en el historial.")
+                lbl.setStyleSheet("color: #888; margin-top: 20px;")
+                lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                self._history_layout.addWidget(lbl)
+            else:
+                for entry in history:
+                    item = HistorialItemWidget(entry, self._on_historial_item_click)
+                    self._history_layout.addWidget(item)
+            
+            self._history_layout.addStretch()
+        except Exception as e:
+            lbl = QLabel(f"Error al conectar con la base de datos.")
+            lbl.setWordWrap(True)
+            lbl.setStyleSheet("color: #e74c3c; font-weight: bold;")
+            self._history_layout.addWidget(lbl)
+            print(f"Error en refresh_history: {e}")
 
     def _on_historial_item_click(self, entry: HistorialEntry, widget: HistorialItemWidget):
         if self._selected_item:

@@ -9,15 +9,15 @@ from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
 # Carga el .env desde la raíz del proyecto (dos niveles arriba de este archivo)
 _ENV_PATH = Path(__file__).resolve().parents[3] / ".env"
-load_dotenv(_ENV_PATH)
+load_dotenv(_ENV_PATH, override=True)
 
 
 def _build_url() -> str:
     host     = os.getenv("DB_HOST", "localhost")
-    port     = os.getenv("DB_PORT", "5432")
-    name     = os.getenv("DB_NAME", "codi")
+    port     = os.getenv("DB_PORT", "5433")
+    name     = os.getenv("DB_NAME", "congreso2026")
     user     = os.getenv("DB_USER", "postgres")
-    password = os.getenv("DB_PASSWORD", "")
+    password = os.getenv("DB_PASSWORD", "1234")
     return f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{name}"
 
 

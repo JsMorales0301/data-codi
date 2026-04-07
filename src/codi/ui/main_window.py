@@ -6,6 +6,7 @@ from codi.ui.views.home_view import HomeView
 from codi.ui.views.parametrizacion_view import ParametrizacionView
 from codi.ui.views.generacion_archivos_view import GeneracionArchivosView
 from codi.ui.views.cargue_view import CargueView
+from codi.ui.views.impresion_view import ImpresionView
 
 
 class _MenuHoverFilter(QObject):
@@ -33,11 +34,13 @@ class MainWindow(QMainWindow):
         self._parametrizacion_view = ParametrizacionView()
         self._generacion_archivos_view = GeneracionArchivosView()
         self._cargue_view = CargueView()
+        self._impresion_view = ImpresionView()
 
         self._stack.addWidget(self._home_view)
         self._stack.addWidget(self._parametrizacion_view)
         self._stack.addWidget(self._generacion_archivos_view)
         self._stack.addWidget(self._cargue_view)
+        self._stack.addWidget(self._impresion_view)
 
     def _setup_menu(self):
         menu_bar = self.menuBar()
@@ -69,3 +72,11 @@ class MainWindow(QMainWindow):
             lambda: self._stack.setCurrentWidget(self._cargue_view)
         )
         menu_bar.addAction(cargue_action)
+
+        impresion_menu = menu_bar.addMenu("Impresión")
+
+        tablero_action = QAction("Tablero de Producción", self)
+        tablero_action.triggered.connect(
+            lambda: self._stack.setCurrentWidget(self._impresion_view)
+        )
+        impresion_menu.addAction(tablero_action)
